@@ -1,0 +1,4 @@
+client-id: <id>
+input-file-path: songs.txt
+redirect-url: http://localhost:8080/callback
+playlist-name: new-playlist
