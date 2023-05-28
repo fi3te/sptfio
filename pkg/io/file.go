@@ -7,6 +7,27 @@ import (
 	"strings"
 )
 
+func WriteLines(filePath string, lines []string) error {
+	file, err := os.Create(filePath)
+	if err != nil {
+		return fmt.Errorf("cannot create/truncate file with path '%s'", filePath)
+	}
+	defer file.Close()
+
+	fileContent := strings.Join(lines, "\n")
+	_, err = file.WriteString(fileContent)
+	if err != nil {
+		return fmt.Errorf("cannot write content to file with path '%s'", filePath)
+	}
+
+	err = file.Sync()
+	if err != nil {
+		return fmt.Errorf("cannot write content of file with path '%s' to disk", filePath)
+	}
+
+	return nil
+}
+
 func ReadLineByLine(filePath string, skipEmpty bool) (*chan string, error) {
 	lines := make(chan string)
 

@@ -40,11 +40,11 @@ func main() {
 		log.Panicf("Cannot find or create playlist: %v\n", err)
 	}
 
-	tracks, err := client.GetTrackIds(ctx, sc, playlist.Tracks)
+	trackIds, err := client.GetTrackIdsOfPlaylist(ctx, sc, playlist.Tracks)
 	if err != nil {
 		log.Panicf("Cannot fetch tracks: %v\n", err)
 	}
-	log.Printf("Number of tracks in playlist: %d\n", len(tracks))
+	log.Printf("Number of tracks in playlist: %d\n", len(trackIds))
 
 	lines, err := io.ReadLineByLine(cfg.InputFilePath, true)
 	if err != nil {
@@ -52,14 +52,21 @@ func main() {
 	}
 
 	for line := range *lines {
-		log.Printf("Finding best matching track for query '%s'...\n", line)
-		track, err := client.FindBestMatchingTrack(ctx, sc, line)
+		lineIsID := client.IsSpotifyID(line)
+		var track *spotify.FullTrack
+		if lineIsID {
+			log.Printf("Fetching track information for id '%s'...\n", line)
+			track, err = client.GetTrack(ctx, sc, line)
+		} else {
+			log.Printf("Finding best matching track for query '%s'...\n", line)
+			track, err = client.FindBestMatchingTrack(ctx, sc, line)
+		}
 		if err != nil {
 			log.Printf("Cannot find track: %v\n", err)
 			continue
 		}
 
-		if containsId(tracks, track.ID) {
+		if containsId(trackIds, track.ID) {
 			log.Printf("Playlist already contains the track '%s'. Skipping...", track.Name)
 			continue
 		}
@@ -71,10 +78,22 @@ func main() {
 			log.Printf("Added track '%s' to playlist.\n", track.Name)
 		}
 
-		tracks = append(tracks, track.ID)
+		trackIds = append(trackIds, track.ID)
 
 		time.Sleep(100 * time.Millisecond)
 	}
+
+	outputLines := make([]string, len(trackIds))
+	for i := range trackIds {
+		outputLines[i] = string(trackIds[i])
+	}
+	log.Println("Writing output file...")
+	err = io.WriteLines(cfg.OutputFilePath, outputLines)
+	if err != nil {
+		log.Panicf("Cannot write output file: %v\n", err)
+	}
+
+	log.Println("Done.")
 }
 
 func containsId(ids []spotify.ID, id spotify.ID) bool {

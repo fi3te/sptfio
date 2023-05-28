@@ -36,7 +36,7 @@ func CreatePrivatePlaylist(ctx context.Context, sc *spotify.Client, userID strin
 	return sc.CreatePlaylistForUser(ctx, userID, name, description, false, false)
 }
 
-func GetTrackIds(ctx context.Context, sc *spotify.Client, page spotify.PlaylistTrackPage) ([]spotify.ID, error) {
+func GetTrackIdsOfPlaylist(ctx context.Context, sc *spotify.Client, page spotify.PlaylistTrackPage) ([]spotify.ID, error) {
 	var trackIds []spotify.ID
 	for {
 		for _, track := range page.Tracks {

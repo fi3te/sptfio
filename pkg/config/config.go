@@ -22,10 +22,11 @@ func init() {
 }
 
 type Config struct {
-	ClientID      string `yaml:"client-id"`
-	InputFilePath string `yaml:"input-file-path"`
-	RedirectURL   string `yaml:"redirect-url"`
-	PlaylistName  string `yaml:"playlist-name"`
+	ClientID       string `yaml:"client-id"`
+	InputFilePath  string `yaml:"input-file-path"`
+	OutputFilePath string `yaml:"output-file-path"`
+	RedirectURL    string `yaml:"redirect-url"`
+	PlaylistName   string `yaml:"playlist-name"`
 }
 
 func (cfg *Config) GetPort() int {
@@ -71,6 +72,9 @@ func (cfg *Config) validate() error {
 	}
 	if cfg.InputFilePath == "" {
 		return errors.New("attribute 'input file path' must be specified")
+	}
+	if cfg.OutputFilePath == "" {
+		return errors.New("attribute 'output file path' must be specified")
 	}
 	if cfg.RedirectURL == "" {
 		return errors.New("attribute 'redirect URL' must be specified")

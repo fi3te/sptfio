@@ -19,3 +19,7 @@ func FindBestMatchingTrack(ctx context.Context, sc *spotify.Client, query string
 	}
 	return &trackPage.Tracks[0], nil
 }
+
+func GetTrack(ctx context.Context, sc *spotify.Client, id string) (*spotify.FullTrack, error) {
+	return sc.GetTrack(ctx, spotify.ID(id))
+}
